@@ -1,6 +1,8 @@
-package com.ciandt.paul.utils;
+package com.ciandt.paul.dao;
 
 import com.ciandt.paul.GeneralConfig;
+import com.ciandt.paul.entity.FifaRank;
+import com.ciandt.paul.utils.BigQueryUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,14 +16,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Test BigQuery services
+ * Test FifaRank data access object
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {BigQueryUtils.class, GeneralConfig.class})
-public class BigQueryUtilsTest {
+@SpringBootTest(classes = {FifaRankDAO.class, GeneralConfig.class, BigQueryUtils.class})
+public class FifaRankDAOTest {
 
     @Autowired
-    private BigQueryUtils bigQueryUtils;
+    private FifaRankDAO fifaRankDAO;
 
     @Autowired
     private GeneralConfig config;
@@ -31,13 +33,10 @@ public class BigQueryUtilsTest {
         config.setDebug("true");
     }
 
-    /**
-     * Test the query method
-     */
     @Test
-    public void shouldQueryDataFromBQ() throws Exception {
-        List<List<String>> result = bigQueryUtils.executeQuery("SELECT * FROM paul_the_octopus_dataset.fifa_rank LIMIT 10");
-        assertNotNull(result);
-        assertEquals(10, result.size());
+    public void shouldFetchFifaRankPerYear() throws Exception {
+        List<FifaRank> fifaRankList = fifaRankDAO.fetch(2018);
+        assertNotNull(fifaRankList);
+        assertEquals(211, fifaRankList.size());
     }
 }

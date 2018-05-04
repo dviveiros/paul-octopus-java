@@ -50,4 +50,15 @@ public class FifaRank {
     public void setPoints(Integer points) {
         this.points = points;
     }
+
+    @Override
+    public String toString() {
+        return "FifaRank{" +
+                "year=" + year +
+                ", rank=" + rank +
+                ", teamCode='" + teamCode + '\'' +
+                ", teamName='" + teamName + '\'' +
+                ", points=" + points +
+                '}';
+    }
 }

@@ -1,10 +1,12 @@
 package com.ciandt.paul.utils;
 
+import com.ciandt.paul.GeneralConfig;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,6 +22,9 @@ import java.util.UUID;
 public class BigQueryUtils {
 
     private static Logger logger = LoggerFactory.getLogger(BigQueryUtils.class.getName());
+
+    @Autowired
+    private GeneralConfig generalConfig;
 
     private static BigQuery bigQuery;
     private final static String CREDENTIALS_PATH = "project-paul-the-octopus-secret.json";
@@ -48,6 +53,10 @@ public class BigQueryUtils {
      * @throws InterruptedException
      */
     public List<List<String>> executeQuery(String query) throws IOException, InterruptedException {
+
+        if (generalConfig.isDebugEnabled()) {
+            logger.debug("Executing query on BigQuery: " + query);
+        }
 
         BigQuery bigquery = this.getBigQuery();
 
@@ -87,6 +96,10 @@ public class BigQueryUtils {
                 line.add(row.get(i).getStringValue());
             }
             result.add(line);
+        }
+
+        if (generalConfig.isDebugEnabled()) {
+            logger.debug("Returing: " + result.size());
         }
 
         return result;

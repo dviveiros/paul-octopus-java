@@ -47,7 +47,7 @@ public class Application implements CommandLineRunner {
 
         if (args.length == 0) {
             showUsage();
-            System.exit(-1);
+            System.exit(0);
         }
 
         // define the command to be executed
