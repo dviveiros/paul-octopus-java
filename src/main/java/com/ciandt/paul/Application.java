@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
 
@@ -19,9 +20,13 @@ public class Application implements CommandLineRunner {
     private static Logger logger = LoggerFactory.getLogger(Application.class.getName());
 
     @Autowired
-    private PaulTheOctopusService paulTheOctopusService;
+    private PredictionService predictionService;
+
     @Autowired
     private GeneralConfig config;
+
+    @Autowired
+    private ApplicationContext context;
 
     private static final String[] validCommands = {"predict", "upload"};
     private static final String DEFAULT_YEAR = "2018";
@@ -72,7 +77,13 @@ public class Application implements CommandLineRunner {
             logger.debug("debugEnabled = " + debugEnabled);
         }
 
-        System.out.println(this.paulTheOctopusService.sayHello());
+        //prediction
+        if ("predict".equals(command)) {
+            predictionService.predict(parameter);
+        }
+
+
+        System.exit(0);
     }
 
     /**
@@ -105,8 +116,8 @@ public class Application implements CommandLineRunner {
             try {
                 Integer iYear = 0;
                 iYear = Integer.parseInt(args[1]);
-                if (iYear < 2010) {
-                    System.err.println("Invalid year (should be >= 2010): " + iYear);
+                if ((iYear != 2010) && (iYear != 2014) && (iYear != 2018)) {
+                    System.err.println("Invalid year (should be 2010, 2014 or 2018): " + iYear);
                     System.exit(-1);
                 } else {
                     parameter = iYear.toString();

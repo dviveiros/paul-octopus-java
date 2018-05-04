@@ -30,10 +30,17 @@ targetCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 dependencies {
+
+    //Spring Boot
     compile("org.springframework.boot:spring-boot-starter:2.0.1.RELEASE")
     compile("org.springframework.boot:spring-boot-starter-logging:2.0.1.RELEASE")
-    testCompile("junit:junit:4.12")
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    //Unit test
+    testCompile("junit:junit:4.12")
+
+    //Google Cloud Platform
+    compile 'com.google.cloud:google-cloud-bigquery:1.26.0'
 }
 
