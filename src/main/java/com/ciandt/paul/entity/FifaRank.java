@@ -1,7 +1,7 @@
 package com.ciandt.paul.entity;
 
 /**
- * Data with Fifa rank for a specific year
+ * Fifa rank for a specific year
  */
 public class FifaRank {
 

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class responsible for reading Fifa Rank data for a specific year
+ * Class responsible for reading Fifa Rank data
  */
 @Service
 public class FifaRankDAO {
