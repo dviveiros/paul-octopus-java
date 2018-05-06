@@ -42,5 +42,6 @@ dependencies {
 
     //Google Cloud Platform
     compile 'com.google.cloud:google-cloud-bigquery:1.26.0'
+    compile 'com.google.cloud:google-cloud-storage:1.28.0'
 }
 

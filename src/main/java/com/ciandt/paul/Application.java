@@ -23,7 +23,7 @@ public class Application implements CommandLineRunner {
     private PredictionService predictionService;
 
     @Autowired
-    private GeneralConfig config;
+    private Config config;
 
     @Autowired
     private ApplicationContext context;
@@ -47,7 +47,7 @@ public class Application implements CommandLineRunner {
 
         if (args.length == 0) {
             showUsage();
-            System.exit(0);
+            System.exit(-1);
         }
 
         // define the command to be executed

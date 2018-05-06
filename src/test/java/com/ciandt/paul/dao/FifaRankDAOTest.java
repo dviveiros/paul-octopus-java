@@ -1,6 +1,6 @@
 package com.ciandt.paul.dao;
 
-import com.ciandt.paul.GeneralConfig;
+import com.ciandt.paul.Config;
 import com.ciandt.paul.entity.FifaRank;
 import com.ciandt.paul.utils.BigQueryUtils;
 import org.junit.Before;
@@ -19,14 +19,14 @@ import static org.junit.Assert.assertNotNull;
  * Test FifaRank data access object
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {FifaRankDAO.class, GeneralConfig.class, BigQueryUtils.class})
+@SpringBootTest(classes = {FifaRankDAO.class, Config.class, BigQueryUtils.class})
 public class FifaRankDAOTest {
 
     @Autowired
     private FifaRankDAO fifaRankDAO;
 
     @Autowired
-    private GeneralConfig config;
+    private Config config;
 
     @Before
     public void setUp() {

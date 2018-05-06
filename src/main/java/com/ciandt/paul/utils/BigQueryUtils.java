@@ -1,6 +1,6 @@
 package com.ciandt.paul.utils;
 
-import com.ciandt.paul.GeneralConfig;
+import com.ciandt.paul.Config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.*;
@@ -24,25 +24,12 @@ public class BigQueryUtils {
     private static Logger logger = LoggerFactory.getLogger(BigQueryUtils.class.getName());
 
     @Autowired
-    private GeneralConfig generalConfig;
+    private Config config;
 
     private static BigQuery bigQuery;
     private final static String CREDENTIALS_PATH = "project-paul-the-octopus-secret.json";
 
-    public BigQuery getBigQuery() throws IOException {
-        if (bigQuery != null) {
-            return bigQuery;
-        } else {
-            GoogleCredentials credentials;
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream(CREDENTIALS_PATH);
-            //File credentialsPath = new File(CREDENTIALS_PATH);
-            //FileInputStream serviceAccountStream = new FileInputStream(credentialsPath);
-            //credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
-            credentials = ServiceAccountCredentials.fromStream(in);
-            BigQuery bigquery = BigQueryOptions.newBuilder().setCredentials(credentials).build().getService();
-            return bigquery;
-        }
-    }
+
 
     /**
      * Executes a query on BigQuery
@@ -54,7 +41,7 @@ public class BigQueryUtils {
      */
     public List<List<String>> executeQuery(String query) throws IOException, InterruptedException {
 
-        if (generalConfig.isDebugEnabled()) {
+        if (config.isDebugEnabled()) {
             logger.debug("Executing query on BigQuery: " + query);
         }
 
@@ -98,11 +85,32 @@ public class BigQueryUtils {
             result.add(line);
         }
 
-        if (generalConfig.isDebugEnabled()) {
+        if (config.isDebugEnabled()) {
             logger.debug("Returing: " + result.size());
         }
 
         return result;
+    }
+
+    /**
+     * Creates an instance of BigQuery service
+     *
+     * @return Instance of the service
+     * @throws IOException
+     */
+    private BigQuery getBigQuery() throws IOException {
+        if (bigQuery != null) {
+            return bigQuery;
+        } else {
+            GoogleCredentials credentials;
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream(CREDENTIALS_PATH);
+            //File credentialsPath = new File(CREDENTIALS_PATH);
+            //FileInputStream serviceAccountStream = new FileInputStream(credentialsPath);
+            //credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
+            credentials = ServiceAccountCredentials.fromStream(in);
+            BigQuery bigquery = BigQueryOptions.newBuilder().setCredentials(credentials).build().getService();
+            return bigquery;
+        }
     }
 
 }

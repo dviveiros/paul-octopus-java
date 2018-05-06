@@ -1,6 +1,6 @@
 package com.ciandt.paul.dao;
 
-import com.ciandt.paul.GeneralConfig;
+import com.ciandt.paul.Config;
 import com.ciandt.paul.entity.FifaRank;
 import com.ciandt.paul.utils.BigQueryUtils;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public class FifaRankDAO {
     private static Logger logger = LoggerFactory.getLogger(FifaRankDAO.class.getName());
 
     @Autowired
-    private GeneralConfig config;
+    private Config config;
     @Autowired
     private BigQueryUtils bigQueryUtils;
 

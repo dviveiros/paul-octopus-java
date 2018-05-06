@@ -8,20 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
  * Test BigQuery services
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {BigQueryUtils.class, Config.class})
-public class BigQueryUtilsTest {
+@SpringBootTest(classes = {GCSUtils.class, Config.class})
+public class GCSUtilsTest {
 
     @Autowired
-    private BigQueryUtils bigQueryUtils;
+    private GCSUtils gcsUtils;
 
     @Autowired
     private Config config;
@@ -32,12 +29,11 @@ public class BigQueryUtilsTest {
     }
 
     /**
-     * Test the query method
+     * Test the read method
      */
     @Test
-    public void shouldQueryDataFromBQ() throws Exception {
-        List<List<String>> result = bigQueryUtils.executeQuery("SELECT * FROM paul_the_octopus_dataset.fifa_rank LIMIT 10");
-        assertNotNull(result);
-        assertEquals(10, result.size());
+    public void shouldReadFileFromGCS() throws Exception {
+        String strContent = gcsUtils.readFile(config.getDatasetBucket(), "fifa_rank_2014.csv");
+        assertNotNull(strContent);
     }
 }

@@ -14,7 +14,7 @@ public class PredictionService {
     private static Logger logger = LoggerFactory.getLogger(PredictionService.class.getName());
 
     @Autowired
-    private GeneralConfig config;
+    private Config config;
 
     /**
      * Start the prediction process
