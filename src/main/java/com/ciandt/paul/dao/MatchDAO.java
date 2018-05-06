@@ -26,6 +26,39 @@ public class MatchDAO {
     private BigQueryUtils bigQueryUtils;
 
     private static List<Match> allMatches;
+    private static List<Match> currentMatches;
+
+    /**
+     * Return the matches to be predicted for 2018, ordenado por data de jogo crescente
+     */
+    public List<Match> fetch2018Matches() throws IOException, InterruptedException {
+        if (currentMatches != null) {
+            return currentMatches;
+        } else {
+            if (config.isDebugEnabled()) {
+                logger.debug("Loading 2018 matches");
+            }
+
+            currentMatches = new ArrayList<>();
+            Match match = null;
+            String query = "SELECT 2018, home, away FROM paul_the_octopus_dataset.matches order by date";
+            List<List<String>> queryResult = bigQueryUtils.executeQuery(query);
+
+            for (List<String> row : queryResult) {
+                match = new Match();
+                match.setYear(Integer.parseInt(row.get(0)));
+                match.setHomeTeam(row.get(1));
+                match.setAwayTeam(row.get(2));
+                currentMatches.add(match);
+            }
+
+            if (config.isDebugEnabled()) {
+                logger.debug("Data loaded. Found " + currentMatches.size() + " games");
+            }
+
+            return currentMatches;
+        }
+    }
 
     /**
      * Return history data prior to this world cup

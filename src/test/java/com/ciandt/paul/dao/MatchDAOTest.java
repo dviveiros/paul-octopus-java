@@ -46,4 +46,11 @@ public class MatchDAOTest {
         assertNotNull(matchList);
         assertEquals(588, matchList.size());
     }
+
+    @Test
+    public void shouldFetch2018Matches() throws Exception {
+        List<Match> matchList = matchDAO.fetch2018Matches();
+        assertNotNull(matchList);
+        assertEquals(48, matchList.size());
+    }
 }
