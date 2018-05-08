@@ -40,34 +40,50 @@ public class PredictionService {
 
         //Year to be predicted
         Integer worldCupYear = config.getWorldCupYear();
+        Integer[] trainingYears = config.getTrainingYears();
 
+        Predictor predictor = predictorFactory.createsPredictor();
+
+        //Predictions for current world cup
         if (config.isDebugEnabled()) {
             logger.debug("Initializing prediction for year: " + worldCupYear);
         }
-        Predictor predictor = predictorFactory.createsPredictor();
+        List<Prediction> predictionList2018 = this.predict(predictor, worldCupYear);
+
+        //Predictions for the past (training data)
+        List<Prediction> predictionsForTraining = null;
+        for (int i = 0; i < trainingYears.length; i++) {
+            if (config.isDebugEnabled()) {
+                logger.debug("Initializing prediction for year: " + trainingYears[i]);
+            }
+            predictionsForTraining = this.predict(predictor, trainingYears[i]);
+        }
     }
 
     /**
-     * Predict the results for 2018
+     * Predict the results for a world cup
      */
-    List<Prediction> predict2018(Predictor predictor) throws InterruptedException, DataNotAvailableException, IOException {
+    List<Prediction> predict(Predictor predictor, Integer year) throws InterruptedException, DataNotAvailableException, IOException {
         List<Prediction> predictions = new ArrayList<>();
 
-        //Creates predictions for 2018
+        //Creates predictions
         if (config.isDebugEnabled()) {
-            logger.debug("Predicting results for 2018");
+            logger.debug("Predicting results for " + year);
         }
-        List<Match> matchList = matchDAO.fetch2018Matches();
+        List<Match> matchList = null;
+        matchList = matchDAO.fetch(year);
+
         Prediction prediction = null;
         for (Match match : matchList) {
-            Context context = contextBuilder.build(match, 2018);
+            Context context = contextBuilder.build(match, year);
             prediction = predictor.predict(match, context);
             if (config.isDebugEnabled()) {
-                logger.debug("New prediction for World Cup 2018: " + prediction);
+                logger.debug("New prediction for World Cup " + year + ": " + prediction);
             }
             predictions.add(prediction);
         }
 
         return predictions;
     }
+
 }

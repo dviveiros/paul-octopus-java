@@ -47,7 +47,40 @@ public class PredictionServiceTest {
     @Test
     public void shouldPredict2018() throws Exception {
         Predictor predictor = predictorFactory.createsPredictor();
-        List<Prediction> predictionList = predictionService.predict2018(predictor);
+        List<Prediction> predictionList = predictionService.predict(predictor, 2018);
+        assertNotNull(predictionList);
+        assertEquals(48, predictionList.size());
+    }
+
+    /**
+     * Test the prediction method
+     */
+    @Test
+    public void shouldPredict2006() throws Exception {
+        Predictor predictor = predictorFactory.createsPredictor();
+        List<Prediction> predictionList = predictionService.predict(predictor, 2006);
+        assertNotNull(predictionList);
+        assertEquals(48, predictionList.size());
+    }
+
+    /**
+     * Test the prediction method
+     */
+    @Test
+    public void shouldPredict2010() throws Exception {
+        Predictor predictor = predictorFactory.createsPredictor();
+        List<Prediction> predictionList = predictionService.predict(predictor, 2010);
+        assertNotNull(predictionList);
+        assertEquals(48, predictionList.size());
+    }
+
+    /**
+     * Test the prediction method
+     */
+    @Test
+    public void shouldPredict2014() throws Exception {
+        Predictor predictor = predictorFactory.createsPredictor();
+        List<Prediction> predictionList = predictionService.predict(predictor, 2014);
         assertNotNull(predictionList);
         assertEquals(48, predictionList.size());
     }

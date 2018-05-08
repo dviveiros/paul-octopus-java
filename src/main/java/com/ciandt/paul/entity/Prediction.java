@@ -44,7 +44,7 @@ public class Prediction {
 
     @Override
     public String toString() {
-        return this.getMatch().getHomeTeam() + " " + this.getHomeScore() + "x"
+        return this.getMatch().getHomeTeam() + " " + this.getHomeScore() + " x "
                 + this.getAwayScore() + " " + this.getMatch().getAwayTeam();
     }
 }

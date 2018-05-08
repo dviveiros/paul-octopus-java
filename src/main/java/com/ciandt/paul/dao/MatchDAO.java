@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class responsible for reading matches data
@@ -27,38 +29,49 @@ public class MatchDAO {
     private BigQueryUtils bigQueryUtils;
 
     private static List<HistoricalMatch> allMatches;
-    private static List<Match> currentMatches;
+    private static Map<Integer, List<Match>> matchesCache;
+
+    static {
+        matchesCache = new HashMap<>();
+    }
 
     /**
-     * Return the matches to be predicted for 2018, ordenado por data de jogo crescente
+     * Return the matches to be predicted for a specific year
      */
-    public List<Match> fetch2018Matches() throws IOException, InterruptedException, DataNotAvailableException {
-        if (currentMatches != null) {
-            return currentMatches;
+    public List<Match> fetch(Integer year) throws IOException, InterruptedException, DataNotAvailableException {
+        if (matchesCache.get(year) != null) {
+            return matchesCache.get(year);
         } else {
             if (config.isDebugEnabled()) {
                 logger.debug("Loading 2018 matches");
             }
 
-            currentMatches = new ArrayList<>();
+            List<Match> matchList = new ArrayList<>();
             Match match = null;
-            String query = "SELECT 2018, home, away FROM paul_the_octopus_dataset.matches order by date";
-            List<List<String>> queryResult = bigQueryUtils.executeQuery(query);
+            String query = null;
 
+            if (year == 2018) {
+                query = "SELECT 2018, home, away FROM paul_the_octopus_dataset.matches order by date";
+            } else {
+                query = "SELECT " + year + ", home, away FROM paul_the_octopus_dataset.matches_history where year=" + year;
+            }
+
+            List<List<String>> queryResult = bigQueryUtils.executeQuery(query);
             for (List<String> row : queryResult) {
                 match = new Match(row);
-                currentMatches.add(match);
+                matchList.add(match);
             }
+            matchesCache.put(year, matchList);
 
             if (config.isDebugEnabled()) {
-                logger.debug("Data loaded. Found " + currentMatches.size() + " games");
+                logger.debug("Data loaded. Found " + matchList.size() + " games");
             }
 
-            if (currentMatches.size() == 0) {
+            if (matchList.size() == 0) {
                 throw new DataNotAvailableException("Match", 2018);
             }
 
-            return currentMatches;
+            return matchList;
         }
     }
 
