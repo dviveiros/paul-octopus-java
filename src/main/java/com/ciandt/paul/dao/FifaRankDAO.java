@@ -43,7 +43,7 @@ public class FifaRankDAO {
     /**
      * Read the rank for a specific year
      */
-    public List<FifaRank> fetch(Integer year) throws IOException, InterruptedException {
+    public List<FifaRank> fetch(Integer year) throws IOException, InterruptedException, DataNotAvailableException {
 
         //check the cache
         if (cache.get(year) != null) {
@@ -73,6 +73,10 @@ public class FifaRankDAO {
 
             String query = "SELECT * FROM paul_the_octopus_dataset.fifa_rank LIMIT 300";
             queryResult = bigQueryUtils.executeQuery(query);
+
+            if ((queryResult == null) || (queryResult.size() == 0)) {
+                throw new DataNotAvailableException("FifaRank", year);
+            }
 
             for (List<String> row : queryResult) {
                 fifaRank = new FifaRank();

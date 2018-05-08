@@ -31,7 +31,7 @@ public class MatchDAO {
     /**
      * Return the matches to be predicted for 2018, ordenado por data de jogo crescente
      */
-    public List<Match> fetch2018Matches() throws IOException, InterruptedException {
+    public List<Match> fetch2018Matches() throws IOException, InterruptedException, DataNotAvailableException {
         if (currentMatches != null) {
             return currentMatches;
         } else {
@@ -56,6 +56,10 @@ public class MatchDAO {
                 logger.debug("Data loaded. Found " + currentMatches.size() + " games");
             }
 
+            if (currentMatches.size() == 0) {
+                throw new DataNotAvailableException("Match", 2018);
+            }
+
             return currentMatches;
         }
     }
@@ -66,7 +70,7 @@ public class MatchDAO {
      * @param year This method will return data prior to this year
      * @return List of matches prior to the year ordered by year desc
      */
-    public List<Match> fetchHistoryData(Integer year) throws IOException, InterruptedException {
+    public List<Match> fetchHistoryData(Integer year) throws IOException, InterruptedException, DataNotAvailableException {
 
         //check the cache
         if (allMatches == null) {
@@ -103,6 +107,10 @@ public class MatchDAO {
             } else {
                 matchList.add(match);
             }
+        }
+
+        if ((matchList.size() == 0) && (year > 1930)) {
+            throw new DataNotAvailableException("Match", year);
         }
 
         return matchList;
