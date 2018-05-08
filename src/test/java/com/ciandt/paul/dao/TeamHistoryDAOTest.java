@@ -3,6 +3,7 @@ package com.ciandt.paul.dao;
 import com.ciandt.paul.Config;
 import com.ciandt.paul.entity.TeamHistory;
 import com.ciandt.paul.utils.BigQueryUtils;
+import com.ciandt.paul.utils.GCSUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
  * Test Match data access object
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {TeamHistoryDAO.class, Config.class, BigQueryUtils.class})
+@SpringBootTest(classes = {TeamHistoryDAO.class, Config.class, BigQueryUtils.class, GCSUtils.class})
 public class TeamHistoryDAOTest {
 
     @Autowired
@@ -34,14 +35,14 @@ public class TeamHistoryDAOTest {
     }
 
     @Test
-    public void shouldFetchAllTeams() throws Exception {
+    public void shouldFetchAllTeamsFor2018() throws Exception {
         List<TeamHistory> teamHistoryList = teamHistoryDAO.fetch(2018);
         assertNotNull(teamHistoryList);
         assertEquals(32, teamHistoryList.size());
     }
 
     @Test
-    public void shouldFetchBrazil() throws Exception {
+    public void shouldFetchBrazilFor2018() throws Exception {
         TeamHistory teamHistory = teamHistoryDAO.fetch("Brazil", 2018);
         assertNotNull(teamHistory);
         assertEquals("Brazil", teamHistory.getName());
@@ -49,6 +50,60 @@ public class TeamHistoryDAOTest {
         assertEquals(new Integer(5), teamHistory.getPreviousTitles());
         assertEquals(new Integer(7), teamHistory.getPreviousFinals());
         assertEquals(new Integer(11), teamHistory.getPreviousSemifinals());
+    }
+
+    @Test
+    public void shouldFetchAllTeamsFor2006() throws Exception {
+        List<TeamHistory> teamHistoryList = teamHistoryDAO.fetch(2006);
+        assertNotNull(teamHistoryList);
+        assertEquals(32, teamHistoryList.size());
+    }
+
+    @Test
+    public void shouldFetchBrazilFor2006() throws Exception {
+        TeamHistory teamHistory = teamHistoryDAO.fetch("Brazil", 2006);
+        assertNotNull(teamHistory);
+        assertEquals("Brazil", teamHistory.getName());
+        assertEquals(new Integer(17), teamHistory.getPreviousAppearances());
+        assertEquals(new Integer(5), teamHistory.getPreviousTitles());
+        assertEquals(new Integer(7), teamHistory.getPreviousFinals());
+        assertEquals(new Integer(10), teamHistory.getPreviousSemifinals());
+    }
+
+    @Test
+    public void shouldFetchAllTeamsFor2010() throws Exception {
+        List<TeamHistory> teamHistoryList = teamHistoryDAO.fetch(2010);
+        assertNotNull(teamHistoryList);
+        assertEquals(32, teamHistoryList.size());
+    }
+
+    @Test
+    public void shouldFetchBrazilFor2010() throws Exception {
+        TeamHistory teamHistory = teamHistoryDAO.fetch("Brazil", 2010);
+        assertNotNull(teamHistory);
+        assertEquals("Brazil", teamHistory.getName());
+        assertEquals(new Integer(18), teamHistory.getPreviousAppearances());
+        assertEquals(new Integer(5), teamHistory.getPreviousTitles());
+        assertEquals(new Integer(7), teamHistory.getPreviousFinals());
+        assertEquals(new Integer(10), teamHistory.getPreviousSemifinals());
+    }
+
+    @Test
+    public void shouldFetchAllTeamsFor2014() throws Exception {
+        List<TeamHistory> teamHistoryList = teamHistoryDAO.fetch(2014);
+        assertNotNull(teamHistoryList);
+        assertEquals(32, teamHistoryList.size());
+    }
+
+    @Test
+    public void shouldFetchBrazilFor2014() throws Exception {
+        TeamHistory teamHistory = teamHistoryDAO.fetch("Brazil", 2014);
+        assertNotNull(teamHistory);
+        assertEquals("Brazil", teamHistory.getName());
+        assertEquals(new Integer(19), teamHistory.getPreviousAppearances());
+        assertEquals(new Integer(5), teamHistory.getPreviousTitles());
+        assertEquals(new Integer(7), teamHistory.getPreviousFinals());
+        assertEquals(new Integer(10), teamHistory.getPreviousSemifinals());
     }
 
 }
