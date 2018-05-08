@@ -73,7 +73,12 @@ public class Application implements CommandLineRunner {
 
         //prediction
         if ("predict".equals(command)) {
-            predictionService.predict();
+            try {
+                predictionService.predict();
+            } catch (Exception e) {
+                logger.error("Error creating prediction", e);
+                System.exit(-1);
+            }
         }
 
 

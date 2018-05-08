@@ -41,6 +41,20 @@ public class FifaRankDAO {
     }
 
     /**
+     * Read the rank for a specific team and year
+     */
+    public FifaRank fetch(String teamName, Integer year) throws IOException, InterruptedException, DataNotAvailableException {
+        List<FifaRank> fifaRankList = this.fetch(year);
+        for (FifaRank fifaRank : fifaRankList) {
+            if (teamName.equals(fifaRank.getTeamName())) {
+                return fifaRank;
+            }
+        }
+
+        throw new DataNotAvailableException("FifaRank for " + teamName, year);
+    }
+
+    /**
      * Read the rank for a specific year
      */
     public List<FifaRank> fetch(Integer year) throws IOException, InterruptedException, DataNotAvailableException {

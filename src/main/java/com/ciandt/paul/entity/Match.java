@@ -23,8 +23,8 @@ public class Match {
     public Match(List<String> row) {
         super();
         this.setYear(Integer.parseInt(row.get(0)));
-        this.setHomeTeam(row.get(1));
-        this.setAwayTeam(row.get(2));
+        this.setHomeTeam(row.get(1).trim());
+        this.setAwayTeam(row.get(2).trim());
     }
 
     public Integer getYear() {
