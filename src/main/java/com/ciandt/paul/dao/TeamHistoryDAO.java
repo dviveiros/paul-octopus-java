@@ -77,13 +77,7 @@ public class TeamHistoryDAO {
                 List<List<String>> queryResult = bigQueryUtils.executeQuery(query);
 
                 for (List<String> row : queryResult) {
-                    teamHistory = new TeamHistory();
-                    teamHistory.setName(row.get(0));
-                    teamHistory.setPreviousAppearances(Integer.parseInt(row.get(1)));
-                    teamHistory.setPreviousTitles(Integer.parseInt(row.get(2)));
-                    teamHistory.setPreviousFinals(Integer.parseInt(row.get(3)));
-                    teamHistory.setPreviousSemifinals(Integer.parseInt(row.get(4)));
-
+                    teamHistory = new TeamHistory(row);
                     allTeamHistory2018.put(teamHistory.getName(), teamHistory);
                 }
             }
@@ -101,12 +95,7 @@ public class TeamHistoryDAO {
                 Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
                 TeamHistory teamHistory = null;
                 for (CSVRecord record : records) {
-                    teamHistory = new TeamHistory();
-                    teamHistory.setName(record.get(0));
-                    teamHistory.setPreviousAppearances(Integer.parseInt(record.get(1)));
-                    teamHistory.setPreviousTitles(Integer.parseInt(record.get(2)));
-                    teamHistory.setPreviousFinals(Integer.parseInt(record.get(3)));
-                    teamHistory.setPreviousSemifinals(Integer.parseInt(record.get(4)));
+                    teamHistory = new TeamHistory(record);
 
                     if (year == 2006) {
                         if (allTeamHistory2006 == null) {

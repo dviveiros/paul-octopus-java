@@ -1,6 +1,7 @@
 package com.ciandt.paul.dao;
 
 import com.ciandt.paul.Config;
+import com.ciandt.paul.entity.HistoricalMatch;
 import com.ciandt.paul.entity.Match;
 import com.ciandt.paul.utils.BigQueryUtils;
 import org.junit.Before;
@@ -35,14 +36,14 @@ public class MatchDAOTest {
 
     @Test
     public void shouldFetchHistoryFor2018() throws Exception {
-        List<Match> matchList = matchDAO.fetchHistoryData(2018);
+        List<HistoricalMatch> matchList = matchDAO.fetchHistoryData(2018);
         assertNotNull(matchList);
         assertEquals(636, matchList.size());
     }
 
     @Test
     public void shouldFetchHistoryFor2014() throws Exception {
-        List<Match> matchList = matchDAO.fetchHistoryData(2014);
+        List<HistoricalMatch> matchList = matchDAO.fetchHistoryData(2014);
         assertNotNull(matchList);
         assertEquals(588, matchList.size());
     }

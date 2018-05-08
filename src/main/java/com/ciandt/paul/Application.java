@@ -29,7 +29,6 @@ public class Application implements CommandLineRunner {
     private ApplicationContext context;
 
     private static final String[] validCommands = {"predict", "upload"};
-    private static final String DEFAULT_YEAR = "2018";
 
     /**
      * Init method called by the runtime execution engine
@@ -42,7 +41,6 @@ public class Application implements CommandLineRunner {
     public void run(String... args) {
 
         String command = null;
-        String parameter = null;
         Boolean debugEnabled = null;
 
         if (args.length == 0) {
@@ -57,9 +55,6 @@ public class Application implements CommandLineRunner {
             System.exit(-1);
         }
 
-        // define the parameter
-        parameter = readParameter(args, command);
-
         // define the debug
         debugEnabled = readDebugStatus(args);
         if ((debugEnabled != null) && (debugEnabled)) {
@@ -73,13 +68,12 @@ public class Application implements CommandLineRunner {
                 logger.debug(">> " + args[i]);
             }
             logger.debug("command = " + command);
-            logger.debug("parameter = " + parameter);
             logger.debug("debugEnabled = " + debugEnabled);
         }
 
         //prediction
         if ("predict".equals(command)) {
-            predictionService.predict(parameter);
+            predictionService.predict();
         }
 
 
@@ -99,40 +93,6 @@ public class Application implements CommandLineRunner {
     }
 
     /**
-     * Read the execution params
-     */
-    private String readParameter(String[] args, String command) {
-        String parameter = null;
-
-        if (command.equals("predict")) {
-
-            if (args.length == 1) {
-                return DEFAULT_YEAR;
-            }
-            if ((args.length == 2) && ("-debug".equals(args[1]))) {
-                return DEFAULT_YEAR;
-            }
-
-            try {
-                Integer iYear = 0;
-                iYear = Integer.parseInt(args[1]);
-                if ((iYear != 2010) && (iYear != 2014) && (iYear != 2018)) {
-                    System.err.println("Invalid year (should be 2010, 2014 or 2018): " + iYear);
-                    System.exit(-1);
-                } else {
-                    parameter = iYear.toString();
-                }
-            } catch (Exception exc) {
-                //invalid parameter
-                showUsage();
-                System.exit(-1);
-            }
-        }
-
-        return parameter;
-    }
-
-    /**
      * Read the debug status
      */
     private Boolean readDebugStatus(String[] args) {
@@ -145,12 +105,9 @@ public class Application implements CommandLineRunner {
     private void showUsage() {
 
         System.out.println("Syntax:");
-        System.out.println(">> ./paul.sh <command> [<params>] [<-debug>]");
+        System.out.println(">> ./paul.sh <command> [<-debug>]");
         System.out.println();
         System.out.println("Command: 'predict' or 'upload'");
-        System.out.println("Params:");
-        System.out.println("\t- predict: <year> (default = 2018)");
-        System.out.println("\t- upload: no params");
     }
 }
 

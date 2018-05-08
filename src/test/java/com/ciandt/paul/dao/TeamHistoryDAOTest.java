@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Test Match data access object
+ * Test Team History data access object
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TeamHistoryDAO.class, Config.class, BigQueryUtils.class, GCSUtils.class})

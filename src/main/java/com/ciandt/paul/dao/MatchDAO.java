@@ -1,6 +1,7 @@
 package com.ciandt.paul.dao;
 
 import com.ciandt.paul.Config;
+import com.ciandt.paul.entity.HistoricalMatch;
 import com.ciandt.paul.entity.Match;
 import com.ciandt.paul.utils.BigQueryUtils;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class MatchDAO {
     @Autowired
     private BigQueryUtils bigQueryUtils;
 
-    private static List<Match> allMatches;
+    private static List<HistoricalMatch> allMatches;
     private static List<Match> currentMatches;
 
     /**
@@ -45,10 +46,7 @@ public class MatchDAO {
             List<List<String>> queryResult = bigQueryUtils.executeQuery(query);
 
             for (List<String> row : queryResult) {
-                match = new Match();
-                match.setYear(Integer.parseInt(row.get(0)));
-                match.setHomeTeam(row.get(1));
-                match.setAwayTeam(row.get(2));
+                match = new Match(row);
                 currentMatches.add(match);
             }
 
@@ -70,7 +68,7 @@ public class MatchDAO {
      * @param year This method will return data prior to this year
      * @return List of matches prior to the year ordered by year desc
      */
-    public List<Match> fetchHistoryData(Integer year) throws IOException, InterruptedException, DataNotAvailableException {
+    public List<HistoricalMatch> fetchHistoryData(Integer year) throws IOException, InterruptedException, DataNotAvailableException {
 
         //check the cache
         if (allMatches == null) {
@@ -81,17 +79,12 @@ public class MatchDAO {
             }
 
 
-            Match match = null;
+            HistoricalMatch match = null;
             String query = "SELECT * FROM paul_the_octopus_dataset.matches_history order by year desc";
             List<List<String>> queryResult = bigQueryUtils.executeQuery(query);
 
             for (List<String> row : queryResult) {
-                match = new Match();
-                match.setYear(Integer.parseInt(row.get(0)));
-                match.setHomeTeam(row.get(1));
-                match.setHomeScore(Integer.parseInt(row.get(2)));
-                match.setAwayScore(Integer.parseInt(row.get(3)));
-                match.setAwayTeam(row.get(4));
+                match = new HistoricalMatch(row);
                 allMatches.add(match);
             }
 
@@ -100,8 +93,8 @@ public class MatchDAO {
             }
         }
 
-        List<Match> matchList = new ArrayList<>();
-        for (Match match : allMatches) {
+        List<HistoricalMatch> matchList = new ArrayList<>();
+        for (HistoricalMatch match : allMatches) {
             if (match.getYear() >= year) {
                 continue;
             } else {

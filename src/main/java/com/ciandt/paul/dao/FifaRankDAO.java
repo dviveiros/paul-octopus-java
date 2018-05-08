@@ -61,11 +61,7 @@ public class FifaRankDAO {
             Reader in = new StringReader(content);
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             for (CSVRecord record : records) {
-                fifaRank = new FifaRank();
-                fifaRank.setRank(Integer.valueOf(record.get(0)));
-                fifaRank.setTeamCode(record.get(1));
-                fifaRank.setTeamName(record.get(2));
-                fifaRank.setPoints(Integer.parseInt(record.get(3)));
+                fifaRank = new FifaRank(record);
                 fifaRankList.add(fifaRank);
             }
         } else {
@@ -79,11 +75,7 @@ public class FifaRankDAO {
             }
 
             for (List<String> row : queryResult) {
-                fifaRank = new FifaRank();
-                fifaRank.setRank(Integer.valueOf(row.get(0)));
-                fifaRank.setTeamCode(row.get(1));
-                fifaRank.setTeamName(row.get(2));
-                fifaRank.setPoints(Integer.parseInt(row.get(3)));
+                fifaRank = new FifaRank(row);
                 fifaRankList.add(fifaRank);
             }
         }

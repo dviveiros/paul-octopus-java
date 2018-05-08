@@ -1,5 +1,9 @@
 package com.ciandt.paul.entity;
 
+import org.apache.commons.csv.CSVRecord;
+
+import java.util.List;
+
 public class TeamHistory {
 
     private String name;
@@ -8,43 +12,65 @@ public class TeamHistory {
     private Integer previousFinals;
     private Integer previousSemifinals;
 
-    public String getName() {
-        return name;
+    /**
+     * Constructor
+     */
+    public TeamHistory(List<String> row) {
+        this.setName(row.get(0));
+        this.setPreviousAppearances(Integer.parseInt(row.get(1)));
+        this.setPreviousTitles(Integer.parseInt(row.get(2)));
+        this.setPreviousFinals(Integer.parseInt(row.get(3)));
+        this.setPreviousSemifinals(Integer.parseInt(row.get(4)));
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * Constructor
+     */
+    public TeamHistory(CSVRecord record) {
+        this.setName(record.get(0));
+        this.setPreviousAppearances(Integer.parseInt(record.get(1)));
+        this.setPreviousTitles(Integer.parseInt(record.get(2)));
+        this.setPreviousFinals(Integer.parseInt(record.get(3)));
+        this.setPreviousSemifinals(Integer.parseInt(record.get(4)));
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Integer getPreviousTitles() {
         return previousTitles;
     }
 
-    public void setPreviousTitles(Integer previousTitles) {
-        this.previousTitles = previousTitles;
-    }
-
     public Integer getPreviousAppearances() {
         return previousAppearances;
-    }
-
-    public void setPreviousAppearances(Integer previousAppearances) {
-        this.previousAppearances = previousAppearances;
     }
 
     public Integer getPreviousFinals() {
         return previousFinals;
     }
 
-    public void setPreviousFinals(Integer previousFinals) {
-        this.previousFinals = previousFinals;
-    }
-
     public Integer getPreviousSemifinals() {
         return previousSemifinals;
     }
 
-    public void setPreviousSemifinals(Integer previousSemifinals) {
+    private void setName(String name) {
+        this.name = name;
+    }
+
+    private void setPreviousTitles(Integer previousTitles) {
+        this.previousTitles = previousTitles;
+    }
+
+    private void setPreviousAppearances(Integer previousAppearances) {
+        this.previousAppearances = previousAppearances;
+    }
+
+    private void setPreviousFinals(Integer previousFinals) {
+        this.previousFinals = previousFinals;
+    }
+
+    private void setPreviousSemifinals(Integer previousSemifinals) {
         this.previousSemifinals = previousSemifinals;
     }
 

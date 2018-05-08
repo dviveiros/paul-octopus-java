@@ -19,7 +19,11 @@ public class PredictionService {
     /**
      * Start the prediction process
      */
-    public void predict(String worldCupYear) {
+    public void predict() {
+
+        //Year to be predicted
+        Integer worldCupYear = config.getWorldCupYear();
+
         if (config.isDebugEnabled()) {
             logger.debug("Initializing prediction for year: " + worldCupYear);
         }
