@@ -29,4 +29,7 @@ hs_err_pid*
 
 **/.gradle
 **/build
-**/project-paul-the-octopus-secret.json
+.DS_Store
+src/.DS_Store
+src/main/.DS_Store
+src/test/resources/

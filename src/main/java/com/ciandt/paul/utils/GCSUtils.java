@@ -1,8 +1,6 @@
 package com.ciandt.paul.utils;
 
 import com.ciandt.paul.Config;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Utility class to handle GCS operations
@@ -49,14 +46,7 @@ public class GCSUtils {
         if (storage != null) {
             return storage;
         } else {
-            GoogleCredentials credentials;
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream(CREDENTIALS_PATH);
-            //File credentialsPath = new File(CREDENTIALS_PATH);
-            //FileInputStream serviceAccountStream = new FileInputStream(credentialsPath);
-            //credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
-            credentials = ServiceAccountCredentials.fromStream(in);
-            Storage storage = StorageOptions.newBuilder()
-                    .setCredentials(credentials).build().getService();
+            Storage storage = StorageOptions.getDefaultInstance().getService();
             return storage;
         }
     }

@@ -1,8 +1,6 @@
 package com.ciandt.paul.utils;
 
 import com.ciandt.paul.Config;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -102,13 +99,7 @@ public class BigQueryUtils {
         if (bigQuery != null) {
             return bigQuery;
         } else {
-            GoogleCredentials credentials;
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream(CREDENTIALS_PATH);
-            //File credentialsPath = new File(CREDENTIALS_PATH);
-            //FileInputStream serviceAccountStream = new FileInputStream(credentialsPath);
-            //credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
-            credentials = ServiceAccountCredentials.fromStream(in);
-            BigQuery bigquery = BigQueryOptions.newBuilder().setCredentials(credentials).build().getService();
+            BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
             return bigquery;
         }
     }
