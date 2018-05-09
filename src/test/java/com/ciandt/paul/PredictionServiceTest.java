@@ -105,7 +105,7 @@ public class PredictionServiceTest {
      * Test the rules
      */
     @Test
-    public void shouldGet25PointsForExactResultHomeWins() throws Exception {
+    public void shouldGet25PointsForExactResultAwayWins() throws Exception {
         //2006: Costa Rica 1x2 Polonia
         List<HistoricalMatch> matches2006 = matchDAO.fetchResults(2006);
         Prediction prediction = new Prediction("Costa Rica", "Poland", 1, 2, 2006);
@@ -117,7 +117,7 @@ public class PredictionServiceTest {
      * Test the rules
      */
     @Test
-    public void shouldGet25PointsForExactResultAwayWins() throws Exception {
+    public void shouldGet25PointsForExactResultHomeWins() throws Exception {
         //2006: Spain 3x1 Tunisia
         List<HistoricalMatch> matches2006 = matchDAO.fetchResults(2006);
         Prediction prediction = new Prediction("Spain", "Tunisia", 3, 1, 2006);
@@ -201,7 +201,7 @@ public class PredictionServiceTest {
      * Test the rules
      */
     @Test
-    public void shouldGet10PointsForTheWinnerHome() throws Exception {
+    public void shouldGet10PointsForTheWinnerAway() throws Exception {
         //2006: Costa Rica 1x2 Polonia
         List<HistoricalMatch> matches2006 = matchDAO.fetchResults(2006);
         Prediction prediction = new Prediction("Costa Rica", "Poland", 0, 3, 2006);
@@ -213,7 +213,7 @@ public class PredictionServiceTest {
      * Test the rules
      */
     @Test
-    public void shouldGet10PointsForTheWinnerAway() throws Exception {
+    public void shouldGet10PointsForTheWinnerHome() throws Exception {
         //2006: Spain 3x1 Tunisia
         List<HistoricalMatch> matches2006 = matchDAO.fetchResults(2006);
         Prediction prediction = new Prediction("Spain", "Tunisia", 1, 0, 2006);
