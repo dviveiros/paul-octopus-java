@@ -62,7 +62,7 @@ Steps to install and configure the project:
 First, I strongly recommend you to run some basic commands just to try the foundation out.
 
 ```
->> ./paul.sh -c predict
+> ./paul.sh -c predict
     ____              __   __  __            ____       __
    / __ \____ ___  __/ /  / /_/ /_  ___     / __ \_____/ /_____  ____  __  _______
   / /_/ / __ `/ / / / /  / __/ __ \/ _ \   / / / / ___/ __/ __ \/ __ \/ / / / ___/
@@ -92,7 +92,7 @@ The default predictor is the OneZeroPredictor. Which means that all predictions 
 
 Now, let's try a different one:
 ```
->> ./paul.sh -c predict -p ZeroZeroPredictor
+> ./paul.sh -c predict -p ZeroZeroPredictor
     ____              __   __  __            ____       __
    / __ \____ ___  __/ /  / /_/ /_  ___     / __ \_____/ /_____  ____  __  _______
   / /_/ / __ `/ / / / /  / __/ __ \/ _ \   / / / / ___/ __/ __ \/ __ \/ / / / ___/
