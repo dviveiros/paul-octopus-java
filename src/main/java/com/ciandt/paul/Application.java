@@ -43,23 +43,23 @@ public class Application implements CommandLineRunner {
 
         Options options = new Options();
 
-        Option input = new Option("c", "command", true, "command");
+        Option input = new Option("c", "command", true, "command (predict or upload)");
         input.setRequired(true);
         options.addOption(input);
 
-        Option output = new Option("d", "debug", false, "turn on debug mode");
+        Option output = new Option("d", "debug", false, "[OPTIONAL] turn on debug mode (default = off)");
         output.setRequired(false);
         options.addOption(output);
 
-        Option file = new Option("f", "file", false, "generates the output file (CSV)");
+        Option file = new Option("f", "file", false, "[OPTIONAL] generates the CSV file (only for 'predict' command) (default = no file)");
         output.setRequired(false);
         options.addOption(file);
 
-        Option username = new Option("u", "username", true, "username / login (required for upload)");
+        Option username = new Option("u", "username", true, "[OPTIONAL] predictor to be used (must be class name - ex. ZeroZeroPredictor, only for 'predict' command) (default = DefaultPredictor)");
         output.setRequired(false);
         options.addOption(username);
 
-        Option predictor = new Option("p", "predictor", true, "predictor to be used (class name)");
+        Option predictor = new Option("p", "predictor", true, "username / login (required for 'upload' command)");
         output.setRequired(false);
         options.addOption(predictor);
 
