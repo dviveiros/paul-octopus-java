@@ -59,7 +59,7 @@ Steps to install and configure the project:
 
 ## Working on your prediction
 
-First, I strongly recommend you to run some basic commands just to try the foundation out.
+Let start! I strongly recommend you to run some basic commands just to try it out.
 
 ```
 > ./paul.sh -c predict
@@ -123,3 +123,72 @@ Wow! If you change your prediction from 1x0 to 0x0, you should expect a better p
 *Your new benchmark is 30.8333%*
 
 Are you ready to improve it? Just change the implementation of the class `DefaultPredictor` or create a new one and let's see how accurate you can be. Good luck!
+
+## Uploading the results
+
+First, you must execute a prediction using the `-f` flag.
+
+```
+> ./paul.sh -c predict -p ZeroZeroPredictor -f
+    ____              __   __  __            ____       __
+   / __ \____ ___  __/ /  / /_/ /_  ___     / __ \_____/ /_____  ____  __  _______
+  / /_/ / __ `/ / / / /  / __/ __ \/ _ \   / / / / ___/ __/ __ \/ __ \/ / / / ___/
+ / ____/ /_/ / /_/ / /  / /_/ / / /  __/  / /_/ / /__/ /_/ /_/ / /_/ / /_/ (__  )
+/_/    \__,_/\__,_/_/   \__/_/ /_/\___/   \____/\___/\__/\____/ .___/\__,_/____/
+                                                             /_/
+2018-05-08 20:29:46 - Starting Application on MacBookDaniel15 with PID 83585 (/Users/dviveiros/git/paul-octopus-java/build/libs/paul-the-octopus-0.1.jar started by dviveiros in /Users/dviveiros/git/paul-octopus-java)
+2018-05-08 20:29:46 - Running with Spring Boot v2.0.1.RELEASE, Spring v5.0.5.RELEASE
+2018-05-08 20:29:46 - No active profile set, falling back to default profiles: default
+2018-05-08 20:29:47 - Started Application in 1.086 seconds (JVM running for 1.553)
+2018-05-08 20:29:47 - Predicting results for year: 2018
+2018-05-08 20:29:56 - Predicting results for year: 2006
+2018-05-08 20:29:59 - Predicting results for year: 2010
+2018-05-08 20:30:03 - Predicting results for year: 2014
+2018-05-08 20:30:05 - **********************************************
+2018-05-08 20:30:05 - * Algorithm performance
+2018-05-08 20:30:05 - * 2006: Score = 363, Performance = 30.2500 %
+2018-05-08 20:30:05 - * 2010: Score = 406, Performance = 33.8333 %
+2018-05-08 20:30:05 - * 2014: Score = 341, Performance = 28.4167 %
+2018-05-08 20:30:05 - * 
+2018-05-08 20:30:05 - * Overall performance = 30.8333 %
+2018-05-08 20:30:05 - **********************************************
+2018-05-08 20:30:05 - Generating file predictions.csv
+2018-05-08 20:30:05 - File created successfully. Run './paul.sh -c upload -u <username>' to upload it.
+2018-05-08 20:30:05 - Process completed successfully!
+
+```
+
+Double check if the file was correctly created.
+
+```
+> cat predictions.csv
+home,home_score,away_score,away
+Russia,0,0,Saudi Arabia
+Egypt,0,0,Uruguay
+Morocco,0,0,IR Iran
+Portugal,0,0,Spain
+France,0,0,Australia
+Argentina,0,0,Iceland
+Peru,0,0,Denmark
+Croatia,0,0,Nigeria
+...
+```
+
+Upload the file to your bucket using the following command:
+
+```
+> ./paul.sh -c upload -u viveiros
+    ____              __   __  __            ____       __
+   / __ \____ ___  __/ /  / /_/ /_  ___     / __ \_____/ /_____  ____  __  _______
+  / /_/ / __ `/ / / / /  / __/ __ \/ _ \   / / / / ___/ __/ __ \/ __ \/ / / / ___/
+ / ____/ /_/ / /_/ / /  / /_/ / / /  __/  / /_/ / /__/ /_/ /_/ / /_/ / /_/ (__  )
+/_/    \__,_/\__,_/_/   \__/_/ /_/\___/   \____/\___/\__/\____/ .___/\__,_/____/
+                                                             /_/
+2018-05-08 20:32:51 - Starting Application on MacBookDaniel15 with PID 83629 (/Users/dviveiros/git/paul-octopus-java/build/libs/paul-the-octopus-0.1.jar started by dviveiros in /Users/dviveiros/git/paul-octopus-java)
+2018-05-08 20:32:51 - Running with Spring Boot v2.0.1.RELEASE, Spring v5.0.5.RELEASE
+2018-05-08 20:32:51 - No active profile set, falling back to default profiles: default
+2018-05-08 20:32:52 - Started Application in 1.103 seconds (JVM running for 1.57)
+2018-05-08 20:32:52 - Uploading file predictions.csv to bucket ciandt_projectoctopus_2018_viveiros
+2018-05-08 20:32:54 - Upload completed!
+2018-05-08 20:32:54 - Process completed successfully!
+```

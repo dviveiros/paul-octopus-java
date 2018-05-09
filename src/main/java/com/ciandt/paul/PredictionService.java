@@ -74,16 +74,6 @@ public class PredictionService {
             totalPerformance += trainingPerformance[i];
         }
 
-        //Generate file?
-        if (generateFile) {
-            String csvContent = this.generateCSVContent(predictionList2018);
-            FileWriter fileWriter = new FileWriter(config.getPredictionsFilename());
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(csvContent);
-            bufferedWriter.flush();
-            bufferedWriter.close();
-        }
-
         // Final output
         logger.info("**********************************************");
         logger.info("* Algorithm performance");
@@ -94,6 +84,18 @@ public class PredictionService {
         logger.info("* ");
         logger.info("* Overall performance = " + decimalFormat.format(totalPerformance / trainingYears.length));
         logger.info("**********************************************");
+
+        //Generate file?
+        if (generateFile) {
+            logger.info("Generating file " + config.getPredictionsFilename());
+            String csvContent = this.generateCSVContent(predictionList2018);
+            FileWriter fileWriter = new FileWriter(config.getPredictionsFilename());
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(csvContent);
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            logger.info("File created successfully. Run './paul.sh -c upload -u <username>' to upload it.");
+        }
     }
 
     /**
