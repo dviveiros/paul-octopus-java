@@ -4,6 +4,7 @@ import com.ciandt.paul.context.Context;
 import com.ciandt.paul.context.ContextBuilder;
 import com.ciandt.paul.dao.DataNotAvailableException;
 import com.ciandt.paul.dao.MatchDAO;
+import com.ciandt.paul.entity.HistoricalMatch;
 import com.ciandt.paul.entity.Match;
 import com.ciandt.paul.entity.Prediction;
 import com.ciandt.paul.utils.GCSUtils;
@@ -95,7 +96,8 @@ public class PredictionService {
     /**
      * Predict the results for a world cup
      */
-    List<Prediction> predict(Predictor predictor, Integer year) throws InterruptedException, DataNotAvailableException, IOException {
+    List<Prediction> predict(Predictor predictor, Integer year)
+            throws InterruptedException, DataNotAvailableException, IOException {
         List<Prediction> predictions = new ArrayList<>();
 
         List<Match> matchList = null;
@@ -138,6 +140,82 @@ public class PredictionService {
         }
 
         return csvContent;
+    }
+
+    /**
+     * Calculates the score for a prediction according to the rules of the competition
+     */
+    Integer calculateScore(Prediction prediction, List<HistoricalMatch> actualResults)
+            throws InterruptedException, DataNotAvailableException, IOException {
+
+        //find the appropriate match
+        Match match = prediction.getMatch();
+        HistoricalMatch actualResult = null;
+        for (HistoricalMatch currentMatch : actualResults) {
+            if (match.getHomeTeam().equals(currentMatch.getHomeTeam()) &&
+                    match.getAwayTeam().equals(currentMatch.getAwayTeam())) {
+                actualResult = currentMatch;
+                break;
+            }
+        }
+
+        if (actualResult == null) {
+            throw new RuntimeException("Result not found for prediction " + prediction);
+        }
+
+        Integer diffGoals = prediction.getHomeScore() - prediction.getAwayScore();
+        boolean isDraw = diffGoals == 0;
+        boolean homeWins = diffGoals > 0;
+        boolean awayWins = diffGoals < 0;
+
+        //exact score (valid for both draw and non-draw)
+        if (prediction.getHomeScore().equals(actualResult.getHomeScore()) &&
+                prediction.getAwayScore().equals(actualResult.getAwayScore())) {
+            return 25;
+        }
+
+        //Draw
+        if (isDraw) {
+            if (actualResult.getAwayScore() - actualResult.getHomeScore() == 0) { //it's a draw with different score
+                return 15;
+            } else {
+                return 4; // you get points anyway
+            }
+        }
+
+        //home wins
+        if (homeWins) {
+            if (actualResult.getHomeScore() - actualResult.getAwayScore() <= 0) { //wrong prediction
+                return 0;
+            } else if (prediction.getHomeScore().equals(actualResult.getHomeScore())) {
+                return 18;
+            } else if ((actualResult.getHomeScore() - actualResult.getAwayScore()) ==
+                    (prediction.getHomeScore() - prediction.getAwayScore())) {
+                return 15;
+            } else if (prediction.getAwayScore().equals(actualResult.getAwayScore())) {
+                return 12;
+            } else {
+                return 10;
+            }
+        }
+
+        //away wins
+        if (awayWins) {
+            if (actualResult.getHomeScore() - actualResult.getAwayScore() >= 0) { //wrong prediction
+                return 0;
+            } else if (prediction.getAwayScore().equals(actualResult.getAwayScore())) {
+                return 18;
+            } else if ((actualResult.getHomeScore() - actualResult.getAwayScore()) ==
+                    (prediction.getHomeScore() - prediction.getAwayScore())) {
+                return 15;
+            } else if (prediction.getHomeScore().equals(actualResult.getHomeScore())) {
+                return 12;
+            } else {
+                return 10;
+            }
+        }
+
+        return 0;
     }
 
 }

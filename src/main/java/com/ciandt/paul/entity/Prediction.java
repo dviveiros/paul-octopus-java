@@ -18,6 +18,20 @@ public class Prediction {
         this.match = match;
     }
 
+    /**
+     * Constructor
+     *
+     * @return
+     */
+    public Prediction(String homeTeam, String awayTeam, Integer homeScore, Integer awayScore, Integer year) {
+        this.match = new Match();
+        this.match.setHomeTeam(homeTeam);
+        this.match.setAwayTeam(awayTeam);
+        this.match.setYear(year);
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
+    }
+
     public Match getMatch() {
         return match;
     }

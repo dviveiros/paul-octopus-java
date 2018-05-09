@@ -75,4 +75,25 @@ public class MatchDAOTest {
         assertNotNull(matchList);
         assertEquals(48, matchList.size());
     }
+
+    @Test
+    public void shouldFetch2006Results() throws Exception {
+        List<HistoricalMatch> matchList = matchDAO.fetchResults(2006);
+        assertNotNull(matchList);
+        assertEquals(48, matchList.size());
+    }
+
+    @Test
+    public void shouldFetch2010Results() throws Exception {
+        List<HistoricalMatch> matchList = matchDAO.fetchResults(2010);
+        assertNotNull(matchList);
+        assertEquals(48, matchList.size());
+    }
+
+    @Test
+    public void shouldFetch2014Results() throws Exception {
+        List<HistoricalMatch> matchList = matchDAO.fetchResults(2014);
+        assertNotNull(matchList);
+        assertEquals(48, matchList.size());
+    }
 }

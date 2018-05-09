@@ -83,6 +83,52 @@ public class MatchDAO {
      */
     public List<HistoricalMatch> fetchHistoryData(Integer year) throws IOException, InterruptedException, DataNotAvailableException {
 
+        this.loadHistoricalMatches();
+
+        List<HistoricalMatch> matchList = new ArrayList<>();
+        for (HistoricalMatch match : allMatches) {
+            if (match.getYear() >= year) {
+                continue;
+            } else {
+                matchList.add(match);
+            }
+        }
+
+        if ((matchList.size() == 0) && (year > 1930)) {
+            throw new DataNotAvailableException("HistoricalMatch", year);
+        }
+
+        return matchList;
+    }
+
+    /**
+     * Return the actual results for a specific year
+     *
+     * @param year Year for the results
+     * @return Results for the year
+     */
+    public List<HistoricalMatch> fetchResults(Integer year)
+            throws IOException, InterruptedException, DataNotAvailableException {
+        this.loadHistoricalMatches();
+
+        List<HistoricalMatch> matchList = new ArrayList<>();
+        for (HistoricalMatch match : allMatches) {
+            if (match.getYear().equals(year)) {
+                matchList.add(match);
+            }
+        }
+
+        if (matchList.size() == 0) {
+            throw new DataNotAvailableException("HistoricalMatch", year);
+        }
+
+        return matchList;
+    }
+
+    /**
+     * Load matches
+     */
+    private void loadHistoricalMatches() throws IOException, InterruptedException {
         //check the cache
         if (allMatches == null) {
             allMatches = new ArrayList<>();
@@ -105,21 +151,6 @@ public class MatchDAO {
                 logger.debug("Data loaded. Found " + allMatches.size() + " games");
             }
         }
-
-        List<HistoricalMatch> matchList = new ArrayList<>();
-        for (HistoricalMatch match : allMatches) {
-            if (match.getYear() >= year) {
-                continue;
-            } else {
-                matchList.add(match);
-            }
-        }
-
-        if ((matchList.size() == 0) && (year > 1930)) {
-            throw new DataNotAvailableException("Match", year);
-        }
-
-        return matchList;
     }
 
 }
