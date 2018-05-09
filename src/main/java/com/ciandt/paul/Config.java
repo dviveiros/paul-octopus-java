@@ -14,6 +14,8 @@ public class Config {
     private String datasetBucket = "project-paul-the-octopus-datasets";
     private String predictionsFilename = "predictions.csv";
     private String predictionsBucketPrefix = "ciandt_projectoctopus_2018_";
+    private Integer maxScorePerWorldCup = 25 * 48;
+    private String defaultPredictor = "DefaultPredictor";
 
     public String getDebug() {
         return debug;
@@ -45,5 +47,13 @@ public class Config {
 
     public String getPredictionsBucketPrefix() {
         return predictionsBucketPrefix;
+    }
+
+    public Integer getMaxScorePerWorldCup() {
+        return maxScorePerWorldCup;
+    }
+
+    public String getDefaultPredictor() {
+        return defaultPredictor;
     }
 }

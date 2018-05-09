@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,17 +41,24 @@ public class PredictionService {
     @Autowired
     private GCSUtils gcsUtils;
 
+    private static DecimalFormat decimalFormat = new DecimalFormat("#,##0.0000 %");
+
     /**
      * Start the prediction process
      * @param generateFile If this method should generate the predictions.csv file or not
+     * @param strPredictor Name of the Predictor class to be used
      */
-    public void predict(Boolean generateFile) throws InterruptedException, DataNotAvailableException, IOException {
+    public void predict(Boolean generateFile, String strPredictor)
+            throws InterruptedException, DataNotAvailableException, IOException {
 
         //Year to be predicted
         Integer worldCupYear = config.getWorldCupYear();
         Integer[] trainingYears = config.getTrainingYears();
+        Integer[] trainingScores = new Integer[trainingYears.length];
+        Double[] trainingPerformance = new Double[trainingYears.length];
+        Double totalPerformance = 0d;
 
-        Predictor predictor = predictorFactory.createsPredictor();
+        Predictor predictor = predictorFactory.createsPredictor(strPredictor);
 
         //Predictions for current world cup
         logger.info("Predicting results for year: " + worldCupYear);
@@ -61,6 +69,9 @@ public class PredictionService {
         for (int i = 0; i < trainingYears.length; i++) {
             logger.info("Predicting results for year: " + trainingYears[i]);
             predictionsForTraining = this.predict(predictor, trainingYears[i]);
+            trainingScores[i] = this.calculatePerformance(predictionsForTraining, trainingYears[i]);
+            trainingPerformance[i] = new Double(trainingScores[i]) / config.getMaxScorePerWorldCup();
+            totalPerformance += trainingPerformance[i];
         }
 
         //Generate file?
@@ -72,6 +83,17 @@ public class PredictionService {
             bufferedWriter.flush();
             bufferedWriter.close();
         }
+
+        // Final output
+        logger.info("**********************************************");
+        logger.info("* Algorithm performance");
+        for (int i = 0; i < trainingYears.length; i++) {
+            logger.info("* " + trainingYears[i] + ": Score = " + trainingScores[i]
+                    + ", Performance = " + decimalFormat.format(trainingPerformance[i]));
+        }
+        logger.info("* ");
+        logger.info("* Overall performance = " + decimalFormat.format(totalPerformance / trainingYears.length));
+        logger.info("**********************************************");
     }
 
     /**
@@ -143,6 +165,20 @@ public class PredictionService {
     }
 
     /**
+     * Calculates the performance for a given year
+     */
+    Integer calculatePerformance(List<Prediction> predictions, Integer year) throws InterruptedException, DataNotAvailableException, IOException {
+        List<HistoricalMatch> actualResults = matchDAO.fetchResults(year);
+        Integer total = 0;
+        Integer score = 0;
+        for (Prediction prediction : predictions) {
+            score = this.calculateScore(prediction, actualResults);
+            total += score;
+        }
+        return total;
+    }
+
+    /**
      * Calculates the score for a prediction according to the rules of the competition
      */
     Integer calculateScore(Prediction prediction, List<HistoricalMatch> actualResults)
@@ -177,8 +213,10 @@ public class PredictionService {
         //Draw
         if (isDraw) {
             if (actualResult.getAwayScore() - actualResult.getHomeScore() == 0) { //it's a draw with different score
+                this.logScore(prediction, actualResult, 15);
                 return 15;
             } else {
+                this.logScore(prediction, actualResult, 4);
                 return 4; // you get points anyway
             }
         }
@@ -186,15 +224,20 @@ public class PredictionService {
         //home wins
         if (homeWins) {
             if (actualResult.getHomeScore() - actualResult.getAwayScore() <= 0) { //wrong prediction
+                this.logScore(prediction, actualResult, 0);
                 return 0;
             } else if (prediction.getHomeScore().equals(actualResult.getHomeScore())) {
+                this.logScore(prediction, actualResult, 18);
                 return 18;
             } else if ((actualResult.getHomeScore() - actualResult.getAwayScore()) ==
                     (prediction.getHomeScore() - prediction.getAwayScore())) {
+                this.logScore(prediction, actualResult, 15);
                 return 15;
             } else if (prediction.getAwayScore().equals(actualResult.getAwayScore())) {
+                this.logScore(prediction, actualResult, 12);
                 return 12;
             } else {
+                this.logScore(prediction, actualResult, 10);
                 return 10;
             }
         }
@@ -202,20 +245,34 @@ public class PredictionService {
         //away wins
         if (awayWins) {
             if (actualResult.getHomeScore() - actualResult.getAwayScore() >= 0) { //wrong prediction
+                this.logScore(prediction, actualResult, 0);
                 return 0;
             } else if (prediction.getAwayScore().equals(actualResult.getAwayScore())) {
+                this.logScore(prediction, actualResult, 18);
                 return 18;
             } else if ((actualResult.getHomeScore() - actualResult.getAwayScore()) ==
                     (prediction.getHomeScore() - prediction.getAwayScore())) {
+                this.logScore(prediction, actualResult, 15);
                 return 15;
             } else if (prediction.getHomeScore().equals(actualResult.getHomeScore())) {
+                this.logScore(prediction, actualResult, 12);
                 return 12;
             } else {
+                this.logScore(prediction, actualResult, 10);
                 return 10;
             }
         }
 
+        this.logScore(prediction, actualResult, 0);
         return 0;
+    }
+
+    private void logScore(Prediction prediction, HistoricalMatch match, Integer score) {
+        if (config.isDebugEnabled()) {
+            logger.debug("Score for match [" + prediction.getMatch().getHomeTeam() + " x " + prediction.getMatch().getAwayTeam() +
+                    "] = " + score + " (prediction: " + prediction.getHomeScore() + " x " + prediction.getAwayScore() +
+                    " // actual = " + match.getHomeScore() + " x " + match.getAwayScore() + ")");
+        }
     }
 
 }

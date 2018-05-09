@@ -59,6 +59,10 @@ public class Application implements CommandLineRunner {
         output.setRequired(false);
         options.addOption(username);
 
+        Option predictor = new Option("p", "predictor", true, "predictor to be used (class name)");
+        output.setRequired(false);
+        options.addOption(predictor);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd;
@@ -79,6 +83,10 @@ public class Application implements CommandLineRunner {
         }
         Boolean generateFile = cmd.hasOption("file");
         String strUsername = cmd.getOptionValue("username");
+        String strPredictor = cmd.getOptionValue("predictor");
+        if (strPredictor == null) {
+            strPredictor = config.getDefaultPredictor();
+        }
 
         //log the arguments
         if (config.isDebugEnabled()) {
@@ -90,12 +98,13 @@ public class Application implements CommandLineRunner {
             logger.debug("debug mode = " + debugEnabled);
             logger.debug("generate file = " + generateFile);
             logger.debug("username = " + strUsername);
+            logger.debug("predictor = " + strPredictor);
         }
 
         //prediction
         if ("predict".equals(command)) {
             try {
-                predictionService.predict(generateFile);
+                predictionService.predict(generateFile, strPredictor);
             } catch (Exception e) {
                 logger.error("Error creating prediction", e);
                 System.exit(1);
