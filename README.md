@@ -122,4 +122,4 @@ Wow! If you change your prediction from 1x0 to 0x0, you should expect a better p
 
 *Your new benchmark is 30.8333%*
 
-Are you ready to improve it? Just change the implementation of the class `DefaultPredictor` or create a new one and let's see how accurate can you be. Good luck!
+Are you ready to improve it? Just change the implementation of the class `DefaultPredictor` or create a new one and let's see how accurate you can be. Good luck!
