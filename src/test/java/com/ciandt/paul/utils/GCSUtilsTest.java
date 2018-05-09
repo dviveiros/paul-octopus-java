@@ -36,4 +36,12 @@ public class GCSUtilsTest {
         String strContent = gcsUtils.readFile(config.getDatasetBucket(), "fifa_rank_2014.csv");
         assertNotNull(strContent);
     }
+
+    /**
+     * Test the upload method
+     */
+    @Test
+    public void shouldWriteFileToGCS() throws Exception {
+        gcsUtils.writeFile("unittest_paul_java", "teste.txt", "teste");
+    }
 }

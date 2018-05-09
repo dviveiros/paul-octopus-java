@@ -1,5 +1,6 @@
 package com.ciandt.paul;
 
+import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import java.util.Arrays;
+import java.io.IOException;
 
 /**
  * This is the basic Application class. When you run the command line, this is the first class that will be called
@@ -40,26 +41,44 @@ public class Application implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        String command = null;
-        Boolean debugEnabled = null;
+        Options options = new Options();
 
-        if (args.length == 0) {
-            showUsage();
-            System.exit(-1);
+        Option input = new Option("c", "command", true, "command");
+        input.setRequired(true);
+        options.addOption(input);
+
+        Option output = new Option("d", "debug", false, "turn on debug mode");
+        output.setRequired(false);
+        options.addOption(output);
+
+        Option file = new Option("f", "file", false, "generates the output file (CSV)");
+        output.setRequired(false);
+        options.addOption(file);
+
+        Option username = new Option("u", "username", true, "username / login (required for upload)");
+        output.setRequired(false);
+        options.addOption(username);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("paul.sh", options);
+            System.exit(1);
+            return;
         }
 
-        // define the command to be executed
-        command = readCommand(args);
-        if (command == null) {
-            showUsage();
-            System.exit(-1);
-        }
-
-        // define the debug
-        debugEnabled = readDebugStatus(args);
-        if ((debugEnabled != null) && (debugEnabled)) {
+        String command = cmd.getOptionValue("command");
+        Boolean debugEnabled = cmd.hasOption("debug");
+        if (debugEnabled) {
             config.setDebug("true");
         }
+        Boolean generateFile = cmd.hasOption("file");
+        String strUsername = cmd.getOptionValue("username");
 
         //log the arguments
         if (config.isDebugEnabled()) {
@@ -68,51 +87,39 @@ public class Application implements CommandLineRunner {
                 logger.debug(">> " + args[i]);
             }
             logger.debug("command = " + command);
-            logger.debug("debugEnabled = " + debugEnabled);
+            logger.debug("debug mode = " + debugEnabled);
+            logger.debug("generate file = " + generateFile);
+            logger.debug("username = " + strUsername);
         }
 
         //prediction
         if ("predict".equals(command)) {
             try {
-                predictionService.predict();
+                predictionService.predict(generateFile);
             } catch (Exception e) {
                 logger.error("Error creating prediction", e);
-                System.exit(-1);
+                System.exit(1);
             }
         }
 
+        //upload
+        if ("upload".equals(command)) {
+            if (strUsername == null) {
+                formatter.printHelp("paul.sh", options);
+                System.exit(1);
+            } else {
+                try {
+                    predictionService.uploadPredictions(strUsername);
+                } catch (IOException e) {
+                    logger.error("Error uploading file to GCS", e);
+                    System.exit(1);
+                }
+            }
+        }
 
+        logger.info("Process completed successfully!");
         System.exit(0);
     }
 
-    /**
-     * Read the command to be executed
-     */
-    private String readCommand(String[] args) {
-        String command = args[0];
-        if (!Arrays.asList(validCommands).contains(command)) {
-            return null;
-        } else {
-            return command;
-        }
-    }
-
-    /**
-     * Read the debug status
-     */
-    private Boolean readDebugStatus(String[] args) {
-        return "-debug".equals(args[args.length - 1]);
-    }
-
-    /**
-     * Invalid command line. Show usage.
-     */
-    private void showUsage() {
-
-        System.out.println("Syntax:");
-        System.out.println(">> ./paul.sh <command> [<-debug>]");
-        System.out.println();
-        System.out.println("Command: 'predict' or 'upload'");
-    }
 }
 

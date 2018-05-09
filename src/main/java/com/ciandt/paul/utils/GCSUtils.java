@@ -2,6 +2,7 @@ package com.ciandt.paul.utils;
 
 import com.ciandt.paul.Config;
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.slf4j.Logger;
@@ -34,6 +35,21 @@ public class GCSUtils {
         }
         Blob blob = getStorage().get(bucket, filename);
         return new String(blob.getContent());
+    }
+
+    /**
+     * Write a text file to GCS
+     */
+    public void writeFile(String bucket, String filename, String content) throws IOException {
+        if (config.isDebugEnabled()) {
+            logger.debug("Uploading a file to GCS. Bucket name = " + bucket + ", filename = " + filename);
+        }
+
+        Storage storage = getStorage();
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucket, filename)
+                .setContentType("text/csv")
+                .build();
+        storage.create(blobInfo, content.getBytes());
     }
 
     /**

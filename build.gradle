@@ -46,5 +46,7 @@ dependencies {
 
     //Other tools
     compile 'org.apache.commons:commons-csv:1.5'
+    compile 'commons-cli:commons-cli:1.4'
+    compile 'commons-io:commons-io:2.6'
 }
 

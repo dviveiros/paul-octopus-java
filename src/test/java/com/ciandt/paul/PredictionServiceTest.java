@@ -84,4 +84,16 @@ public class PredictionServiceTest {
         assertNotNull(predictionList);
         assertEquals(48, predictionList.size());
     }
+
+    /**
+     * Test the prediction method
+     */
+    @Test
+    public void shouldGenerateCSVFile() throws Exception {
+        Predictor predictor = predictorFactory.createsPredictor();
+        List<Prediction> predictionList = predictionService.predict(predictor, 2018);
+        String csvContent = predictionService.generateCSVContent(predictionList);
+        assertNotNull(csvContent);
+        assertEquals(49, csvContent.split("\n").length);
+    }
 }

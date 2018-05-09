@@ -6,12 +6,16 @@ import com.ciandt.paul.dao.DataNotAvailableException;
 import com.ciandt.paul.dao.MatchDAO;
 import com.ciandt.paul.entity.Match;
 import com.ciandt.paul.entity.Prediction;
+import com.ciandt.paul.utils.GCSUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +36,14 @@ public class PredictionService {
     private ContextBuilder contextBuilder;
     @Autowired
     private PredictorFactory predictorFactory;
+    @Autowired
+    private GCSUtils gcsUtils;
 
     /**
      * Start the prediction process
+     * @param generateFile If this method should generate the predictions.csv file or not
      */
-    public void predict() throws InterruptedException, DataNotAvailableException, IOException {
+    public void predict(Boolean generateFile) throws InterruptedException, DataNotAvailableException, IOException {
 
         //Year to be predicted
         Integer worldCupYear = config.getWorldCupYear();
@@ -45,19 +52,44 @@ public class PredictionService {
         Predictor predictor = predictorFactory.createsPredictor();
 
         //Predictions for current world cup
-        if (config.isDebugEnabled()) {
-            logger.debug("Initializing prediction for year: " + worldCupYear);
-        }
+        logger.info("Predicting results for year: " + worldCupYear);
         List<Prediction> predictionList2018 = this.predict(predictor, worldCupYear);
 
         //Predictions for the past (training data)
         List<Prediction> predictionsForTraining = null;
         for (int i = 0; i < trainingYears.length; i++) {
-            if (config.isDebugEnabled()) {
-                logger.debug("Initializing prediction for year: " + trainingYears[i]);
-            }
+            logger.info("Predicting results for year: " + trainingYears[i]);
             predictionsForTraining = this.predict(predictor, trainingYears[i]);
         }
+
+        //Generate file?
+        if (generateFile) {
+            String csvContent = this.generateCSVContent(predictionList2018);
+            FileWriter fileWriter = new FileWriter(config.getPredictionsFilename());
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(csvContent);
+            bufferedWriter.flush();
+            bufferedWriter.close();
+        }
+    }
+
+    /**
+     * Upload the prediction to GCS
+     */
+    public void uploadPredictions(String username) throws IOException {
+
+        File file = new File(config.getPredictionsFilename());
+        if (!file.exists()) {
+            throw new FileNotFoundException("Prediction file not found: " + config.getPredictionsFilename());
+        }
+
+        //read the content
+        String fileContent = FileUtils.readFileToString(file, "UTF-8");
+        logger.info("Uploading file " + config.getPredictionsFilename() + " to bucket " +
+                config.getPredictionsBucketPrefix() + username);
+        gcsUtils.writeFile(config.getPredictionsBucketPrefix() + username,
+                config.getPredictionsFilename(), fileContent);
+        logger.info("Upload completed!");
     }
 
     /**
@@ -66,10 +98,6 @@ public class PredictionService {
     List<Prediction> predict(Predictor predictor, Integer year) throws InterruptedException, DataNotAvailableException, IOException {
         List<Prediction> predictions = new ArrayList<>();
 
-        //Creates predictions
-        if (config.isDebugEnabled()) {
-            logger.debug("Predicting results for " + year);
-        }
         List<Match> matchList = null;
         matchList = matchDAO.fetch(year);
 
@@ -84,6 +112,32 @@ public class PredictionService {
         }
 
         return predictions;
+    }
+
+    /**
+     * Generates the prediction file to be uploaded to GCS
+     */
+    String generateCSVContent(List<Prediction> predictions) throws IOException {
+        StringWriter stringWriter = new StringWriter();
+        CSVPrinter csvPrinter = new CSVPrinter(stringWriter, CSVFormat.DEFAULT
+                .withHeader("home", "home_score", "away_score", "away"));
+        for (Prediction prediction : predictions) {
+            csvPrinter.printRecord(prediction.getMatch().getHomeTeam(),
+                    prediction.getHomeScore(),
+                    prediction.getAwayScore(),
+                    prediction.getMatch().getAwayTeam());
+        }
+
+        csvPrinter.flush();
+
+        String csvContent = stringWriter.toString();
+
+        if (config.isDebugEnabled()) {
+            logger.debug("CSV content generated:");
+            logger.debug(csvContent);
+        }
+
+        return csvContent;
     }
 
 }
