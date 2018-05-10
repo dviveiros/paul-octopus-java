@@ -49,7 +49,8 @@ Steps to install and configure the project:
 4. Install the lastest version of the [gcloud tool](https://cloud.google.com/sdk/downloads). Initialize the tool using:
     ```
     > gcloud init
-    > gcloud auth application-default login //use your @ciandt.com account
+    > gcloud auth application-default login
+    (use your @ciandt.com login for the step above)
     > gcloud config set project project-paul-the-octopus  
     ```
 
