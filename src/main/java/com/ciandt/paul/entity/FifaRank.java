@@ -9,11 +9,11 @@ import java.util.List;
  */
 public class FifaRank {
 
-    public Integer year;
-    public Integer rank;
-    public String teamCode;
-    public String teamName;
-    public Integer points;
+    private Integer year;
+    private Integer rank;
+    private String teamCode;
+    private String teamName;
+    private Integer points;
 
     /**
      * Constructor
