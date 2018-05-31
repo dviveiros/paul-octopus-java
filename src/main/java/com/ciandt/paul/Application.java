@@ -9,8 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import java.io.IOException;
-
 /**
  * This is the basic Application class. When you run the command line, this is the first class that will be called
  * and that will be responsible for triggering the prediction process.
@@ -43,25 +41,9 @@ public class Application implements CommandLineRunner {
 
         Options options = new Options();
 
-        Option input = new Option("c", "command", true, "command (predict or upload)");
-        input.setRequired(true);
-        options.addOption(input);
-
-        Option output = new Option("d", "debug", false, "[OPTIONAL] turn on debug mode (default = off)");
-        output.setRequired(false);
-        options.addOption(output);
-
-        Option file = new Option("f", "file", false, "[OPTIONAL] generates the CSV file (only for 'predict' command) (default = no file)");
-        output.setRequired(false);
+        Option file = new Option("f", "file", true, "File prefix. Example: actual to actual_2006.csv, actual_2010.csv etc");
+        file.setRequired(true);
         options.addOption(file);
-
-        Option username = new Option("u", "username", true, "[OPTIONAL] predictor to be used (must be class name - ex. ZeroZeroPredictor, only for 'predict' command) (default = DefaultPredictor)");
-        output.setRequired(false);
-        options.addOption(username);
-
-        Option predictor = new Option("p", "predictor", true, "username / login (required for 'upload' command)");
-        output.setRequired(false);
-        options.addOption(predictor);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -76,17 +58,9 @@ public class Application implements CommandLineRunner {
             return;
         }
 
-        String command = cmd.getOptionValue("command");
-        Boolean debugEnabled = cmd.hasOption("debug");
-        if (debugEnabled) {
-            config.setDebug("true");
-        }
-        Boolean generateFile = cmd.hasOption("file");
-        String strUsername = cmd.getOptionValue("username");
-        String strPredictor = cmd.getOptionValue("predictor");
-        if (strPredictor == null) {
-            strPredictor = config.getDefaultPredictor();
-        }
+        String command = "predict";
+        Boolean debugEnabled = true;
+        String filename = cmd.getOptionValue("file");
 
         //log the arguments
         if (config.isDebugEnabled()) {
@@ -96,33 +70,16 @@ public class Application implements CommandLineRunner {
             }
             logger.debug("command = " + command);
             logger.debug("debug mode = " + debugEnabled);
-            logger.debug("generate file = " + generateFile);
-            logger.debug("username = " + strUsername);
-            logger.debug("predictor = " + strPredictor);
+            logger.debug("file prefix = " + filename);
         }
 
         //prediction
         if ("predict".equals(command)) {
             try {
-                predictionService.predict(generateFile, strPredictor);
+                predictionService.predict(filename, "CSVPredictor");
             } catch (Exception e) {
                 logger.error("Error creating prediction", e);
                 System.exit(1);
-            }
-        }
-
-        //upload
-        if ("upload".equals(command)) {
-            if (strUsername == null) {
-                formatter.printHelp("paul.sh", options);
-                System.exit(1);
-            } else {
-                try {
-                    predictionService.uploadPredictions(strUsername);
-                } catch (IOException e) {
-                    logger.error("Error uploading file to GCS", e);
-                    System.exit(1);
-                }
             }
         }
 

@@ -1,5 +1,6 @@
 package com.ciandt.paul;
 
+import com.ciandt.paul.utils.GCSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ public class PredictorFactory {
 
     @Autowired
     private Config config;
+    @Autowired
+    private GCSUtils gcsUtils;
 
     /**
      * Creates the predictor algorithm
@@ -33,6 +36,7 @@ public class PredictorFactory {
         try {
             Class clazz = Class.forName("com.ciandt.paul." + strPredictor);
             predictor = (Predictor) clazz.newInstance();
+            predictor.setGcsUtils(gcsUtils);
         } catch (ClassNotFoundException e) {
             logger.error("Predictor class not found: " + strPredictor);
             System.exit(1);
