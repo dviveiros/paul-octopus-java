@@ -49,7 +49,6 @@ public class PredictionService {
             throws Exception {
 
         //Year to be predicted
-        Integer worldCupYear = config.getWorldCupYear();
         Integer[] trainingYears = config.getTrainingYears();
 
         Predictor predictor = predictorFactory.createsPredictor(strPredictor);
@@ -63,10 +62,6 @@ public class PredictionService {
             Double totalPerformance = 0d;
             Integer[] trainingScores = new Integer[trainingYears.length];
             Double[] trainingPerformance = new Double[trainingYears.length];
-
-            //Predictions for current world cup
-            logger.info("[" + filePrefix + "] Predicting results for year: " + worldCupYear);
-            List<Prediction> predictionList2018 = this.predict(predictor, worldCupYear, filePrefix);
 
             //Predictions for the past (training data)
             List<Prediction> predictionsForTraining = null;
