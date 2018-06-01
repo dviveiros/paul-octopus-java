@@ -22,7 +22,7 @@ public class CSVPredictor extends Predictor {
     private static Logger logger = LoggerFactory.getLogger(CSVPredictor.class.getName());
     private static final String BUCKET = "ciandt_projectoctopus_2018_leonardo";
 
-    private static Map<Integer, List<HistoricalMatch>> listMap;
+    private static Map<String, List<HistoricalMatch>> listMap;
 
     static {
         listMap = new HashMap<>();
@@ -33,11 +33,11 @@ public class CSVPredictor extends Predictor {
 
         Prediction prediction = null;
         Integer year = match.getYear();
-        List<HistoricalMatch> matchResults = listMap.get(year);
+        List<HistoricalMatch> matchResults = listMap.get(getCacheKey(year, filePrefix));
 
         if (matchResults == null) {
             matchResults = loadYear(year, filePrefix);
-            listMap.put(year, matchResults);
+            listMap.put(getCacheKey(year, filePrefix), matchResults);
         }
 
         for (HistoricalMatch historicalMatch : matchResults) {
@@ -79,5 +79,9 @@ public class CSVPredictor extends Predictor {
         }
 
         return matchResults;
+    }
+
+    private String getCacheKey(Integer year, String filePrefix) {
+        return year + "_" + filePrefix;
     }
 }

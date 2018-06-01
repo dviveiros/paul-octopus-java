@@ -8,12 +8,14 @@ import com.ciandt.paul.entity.HistoricalMatch;
 import com.ciandt.paul.entity.Match;
 import com.ciandt.paul.entity.Prediction;
 import com.ciandt.paul.utils.GCSUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,42 +45,78 @@ public class PredictionService {
     /**
      * Start the prediction process
      */
-    public void predict(String filePrefix, String strPredictor)
+    public void predict(String strPredictor)
             throws Exception {
 
         //Year to be predicted
         Integer worldCupYear = config.getWorldCupYear();
         Integer[] trainingYears = config.getTrainingYears();
-        Integer[] trainingScores = new Integer[trainingYears.length];
-        Double[] trainingPerformance = new Double[trainingYears.length];
-        Double totalPerformance = 0d;
 
         Predictor predictor = predictorFactory.createsPredictor(strPredictor);
 
-        //Predictions for current world cup
-        logger.info("Predicting results for year: " + worldCupYear);
-        List<Prediction> predictionList2018 = this.predict(predictor, worldCupYear, filePrefix);
+        List<String> prefixes = readFilePrefixes();
+        StringWriter stringWriter = new StringWriter();
+        CSVPrinter csvPrinter = new CSVPrinter(stringWriter, CSVFormat.DEFAULT
+                .withHeader("Prefix", "2006", "2010", "2014", "Overall").withIgnoreEmptyLines().withRecordSeparator("\r\n"));
 
-        //Predictions for the past (training data)
-        List<Prediction> predictionsForTraining = null;
-        for (int i = 0; i < trainingYears.length; i++) {
-            logger.info("Predicting results for year: " + trainingYears[i]);
-            predictionsForTraining = this.predict(predictor, trainingYears[i], filePrefix);
-            trainingScores[i] = this.calculatePerformance(predictionsForTraining, trainingYears[i]);
-            trainingPerformance[i] = new Double(trainingScores[i]) / config.getMaxScorePerWorldCup();
-            totalPerformance += trainingPerformance[i];
+        for (String filePrefix : prefixes) {
+            Double totalPerformance = 0d;
+            Integer[] trainingScores = new Integer[trainingYears.length];
+            Double[] trainingPerformance = new Double[trainingYears.length];
+
+            //Predictions for current world cup
+            logger.info("[" + filePrefix + "] Predicting results for year: " + worldCupYear);
+            List<Prediction> predictionList2018 = this.predict(predictor, worldCupYear, filePrefix);
+
+            //Predictions for the past (training data)
+            List<Prediction> predictionsForTraining = null;
+            for (int i = 0; i < trainingYears.length; i++) {
+                logger.info("Predicting results for year: " + trainingYears[i]);
+                predictionsForTraining = this.predict(predictor, trainingYears[i], filePrefix);
+                trainingScores[i] = this.calculatePerformance(predictionsForTraining, trainingYears[i]);
+                trainingPerformance[i] = new Double(trainingScores[i]) / config.getMaxScorePerWorldCup();
+                totalPerformance += trainingPerformance[i];
+            }
+
+            // Final output
+            logger.info("**********************************************");
+            logger.info("* Algorithm performance");
+            for (int i = 0; i < trainingYears.length; i++) {
+                logger.info("* " + trainingYears[i] + ": Score = " + trainingScores[i]
+                        + ", Performance = " + decimalFormat.format(trainingPerformance[i]));
+            }
+            logger.info("* ");
+            logger.info("* Overall performance = " + decimalFormat.format(totalPerformance / trainingYears.length));
+            logger.info("**********************************************");
+
+            csvPrinter.printRecord(filePrefix,
+                    decimalFormat.format(trainingPerformance[0]),
+                    decimalFormat.format(trainingPerformance[1]),
+                    decimalFormat.format(trainingPerformance[2]),
+                    decimalFormat.format(totalPerformance / 3));
         }
 
-        // Final output
-        logger.info("**********************************************");
-        logger.info("* Algorithm performance");
-        for (int i = 0; i < trainingYears.length; i++) {
-            logger.info("* " + trainingYears[i] + ": Score = " + trainingScores[i]
-                    + ", Performance = " + decimalFormat.format(trainingPerformance[i]));
+        csvPrinter.flush();
+        String csvContent = stringWriter.toString();
+
+        FileWriter fileWriter = new FileWriter("batch_" + System.currentTimeMillis() + ".csv");
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write(csvContent);
+        bufferedWriter.flush();
+        bufferedWriter.close();
+    }
+
+    private List<String> readFilePrefixes() throws IOException {
+        List<String> prefixes = new ArrayList<>();
+
+        FileReader fileReader = new FileReader("batch.txt");
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        String line = null;
+        while ((line = bufferedReader.readLine()) != null) {
+            prefixes.add(line);
         }
-        logger.info("* ");
-        logger.info("* Overall performance = " + decimalFormat.format(totalPerformance / trainingYears.length));
-        logger.info("**********************************************");
+
+        return prefixes;
     }
 
     /**
